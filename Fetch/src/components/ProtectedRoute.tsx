@@ -7,7 +7,7 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   const [isAuth, setIsAuth] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Use a protected endpoint to verify the session (e.g., GET /dogs/breeds)
+   
     axios.get('https://frontend-take-home-service.fetch.com/dogs/breeds', { withCredentials: true })
       .then(() => {
         setIsAuth(true);
@@ -21,7 +21,7 @@ const ProtectedRoute: React.FC<{ children: JSX.Element }> = ({ children }) => {
   }, [navigate]);
 
   if (isAuth === null) {
-    return <div>Loading...</div>; // Optionally, replace with a spinner
+    return <div>Loading...</div>; 
   }
   
   return children;

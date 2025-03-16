@@ -7,9 +7,9 @@ export const loginUser = async (name: string, email: string): Promise<void> => {
     const response = await axios.post(
       `${API_BASE_URL}/auth/login`,
       { name, email },
-      { withCredentials: true }  // ensures the auth cookie is handled automatically
+      { withCredentials: true }  
     );
-    // The auth cookie (fetch-access-token) expires in 1 hour.
+   
     return response.data;
   } catch (error) {
     console.error("Login failed:", error);
