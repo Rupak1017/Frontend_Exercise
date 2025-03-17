@@ -1,6 +1,6 @@
 import React from 'react';
 
-// Define the shape of a Dog object (except for id, which is hidden).
+
 interface Dog {
   id: string;
   img: string;
@@ -10,7 +10,7 @@ interface Dog {
   breed: string;
 }
 
-// Props for the DogCard component
+
 interface DogCardProps {
   dog: Dog;
 }
