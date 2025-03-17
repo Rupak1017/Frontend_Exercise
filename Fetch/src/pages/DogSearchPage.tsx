@@ -21,7 +21,12 @@ const DogSearchPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
   const [breedNames, setBreedNames] = useState<string[]>([]);
+  const [ageMin, setAgeMin] = useState<number | null>(null);
+  const [ageMax, setAgeMax] = useState<number | null>(null);
+  // For alphabetical sorting by breed
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  // Tracks if the user has manually toggled the sort control.
+  const [userHasToggledSort, setUserHasToggledSort] = useState<boolean>(false);
   const navigate = useNavigate();
 
   const getPaginationNumbers = (currentPage: number, totalPages: number): (number | string)[] => {
@@ -46,14 +51,16 @@ const DogSearchPage: React.FC = () => {
     setLoading(true);
     try {
       const from = (page - 1) * PAGE_SIZE;
-      const params: any = { sort: `breed:${sortOrder}`, size: PAGE_SIZE, from };
-      if (selectedBreed) {
-        params.breeds = [selectedBreed];
-      }
-      const response = await axios.get(
-        `${API_BASE_URL}/dogs/search`,
-        { params, withCredentials: true }
-      );
+      // If an age filter is applied and the user hasn't toggled the sort manually,
+      // default to age sorting; otherwise use alphabetical sorting by breed.
+      const sortParam = (ageMin !== null || ageMax !== null) && !userHasToggledSort
+        ? 'age:asc'
+        : `breed:${sortOrder}`;
+      const params: any = { sort: sortParam, size: PAGE_SIZE, from };
+      if (selectedBreed) params.breeds = [selectedBreed];
+      if (ageMin !== null) params.ageMin = ageMin;
+      if (ageMax !== null) params.ageMax = ageMax;
+      const response = await axios.get(`${API_BASE_URL}/dogs/search`, { params, withCredentials: true });
       const searchResults: SearchResults = response.data;
       setPagination(searchResults);
       setCurrentPage(page);
@@ -68,10 +75,7 @@ const DogSearchPage: React.FC = () => {
 
   const loadBreedNames = async () => {
     try {
-      const response = await axios.get(
-        `${API_BASE_URL}/dogs/breeds`,
-        { withCredentials: true }
-      );
+      const response = await axios.get(`${API_BASE_URL}/dogs/breeds`, { withCredentials: true });
       setBreedNames(response.data);
     } catch (error) {
       console.error("Error loading breed names:", error);
@@ -81,11 +85,11 @@ const DogSearchPage: React.FC = () => {
   useEffect(() => {
     loadDogs();
     loadBreedNames();
-  }, []); 
+  }, []); // Load on mount
 
   useEffect(() => {
     loadDogs(1);
-  }, [selectedBreed, sortOrder]);
+  }, [selectedBreed, ageMin, ageMax, sortOrder, userHasToggledSort]);
 
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
 
@@ -102,7 +106,9 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  // Toggle the alphabetical sort order (breed toggle).
   const toggleSortOrder = () => {
+    setUserHasToggledSort(true);
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
   };
 
@@ -111,16 +117,42 @@ const DogSearchPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gray-100 p-6">
       <header className="flex justify-between items-center mb-6">
-        <div className="w-1/3">
+        {/* Left: Logo */}
+        <div className="w-1/4">
           <h1 className="text-2xl font-bold">Dog Page</h1>
         </div>
-        <div className="w-1/3 flex justify-center">
-          <BreedSearchBar
-            breeds={breedNames}
-            onSelect={(breed) => setSelectedBreed(breed)}
-          />
+        {/* Center: Breed Search and Age Filters */}
+        <div className="w-1/2 flex items-center justify-center gap-4">
+          <BreedSearchBar breeds={breedNames} onSelect={(breed) => setSelectedBreed(breed)} />
+          <div className="flex gap-2">
+            <input 
+              type="number" 
+              placeholder="Min Age" 
+              value={ageMin !== null ? ageMin : ''} 
+              onChange={(e) => {
+                const value = e.target.value ? Number(e.target.value) : null;
+                setAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
+              }} 
+              className="border rounded px-2 py-1 w-20"
+              min="0" 
+              max="14"
+            />
+            <input 
+              type="number" 
+              placeholder="Max Age" 
+              value={ageMax !== null ? ageMax : ''} 
+              onChange={(e) => {
+                const value = e.target.value ? Number(e.target.value) : null;
+                setAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
+              }} 
+              className="border rounded px-2 py-1 w-20"
+              min="0" 
+              max="14"
+            />
+          </div>
         </div>
-        <div className="w-1/3 flex justify-end items-center gap-2">
+        {/* Right: Sort Toggle and Logout */}
+        <div className="w-1/4 flex justify-end items-center gap-2">
           <button 
             onClick={toggleSortOrder} 
             className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300"
