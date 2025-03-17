@@ -21,6 +21,7 @@ const DogSearchPage: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
   const [breedNames, setBreedNames] = useState<string[]>([]);
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const navigate = useNavigate();
 
   const getPaginationNumbers = (currentPage: number, totalPages: number): (number | string)[] => {
@@ -45,7 +46,7 @@ const DogSearchPage: React.FC = () => {
     setLoading(true);
     try {
       const from = (page - 1) * PAGE_SIZE;
-      const params: any = { sort: 'breed:asc', size: PAGE_SIZE, from };
+      const params: any = { sort: `breed:${sortOrder}`, size: PAGE_SIZE, from };
       if (selectedBreed) {
         params.breeds = [selectedBreed];
       }
@@ -80,12 +81,11 @@ const DogSearchPage: React.FC = () => {
   useEffect(() => {
     loadDogs();
     loadBreedNames();
-  }, []); // Only once at mount
+  }, []); 
 
-  // When the selected breed changes, reload dogs starting from page 1.
   useEffect(() => {
     loadDogs(1);
-  }, [selectedBreed]);
+  }, [selectedBreed, sortOrder]);
 
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
 
@@ -102,6 +102,10 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+
   const paginationNumbers = totalPages ? getPaginationNumbers(currentPage, totalPages) : [];
 
   return (
@@ -113,13 +117,28 @@ const DogSearchPage: React.FC = () => {
         <div className="w-1/3 flex justify-center">
           <BreedSearchBar
             breeds={breedNames}
-            onSelect={(breed) => {
-              setSelectedBreed(breed);
-            }}
+            onSelect={(breed) => setSelectedBreed(breed)}
           />
         </div>
-        <div className="w-1/3 flex justify-end">
-          <button onClick={handleLogout} className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+        <div className="w-1/3 flex justify-end items-center gap-2">
+          <button 
+            onClick={toggleSortOrder} 
+            className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300"
+          >
+            {sortOrder === 'asc' ? (
+              <span>
+                A → Z <i className="ri-arrow-up-s-line align-middle"></i>
+              </span>
+            ) : (
+              <span>
+                Z → A <i className="ri-arrow-down-s-line align-middle"></i>
+              </span>
+            )}
+          </button>
+          <button 
+            onClick={handleLogout}
+            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+          >
             Logout
           </button>
         </div>
