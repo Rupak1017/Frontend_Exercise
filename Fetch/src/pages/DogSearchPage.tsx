@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import DogCard from '../components/DogCard';
 import { fetchDogsDetails, fetchDogsSearch } from '../api/dogs';
+import { searchLocations } from '../api/locations';
 import axios from 'axios';
 import { logoutUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
@@ -23,9 +24,11 @@ const DogSearchPage: React.FC = () => {
   const [breedNames, setBreedNames] = useState<string[]>([]);
   const [ageMin, setAgeMin] = useState<number | null>(null);
   const [ageMax, setAgeMax] = useState<number | null>(null);
-  // For alphabetical sorting by breed
+  const [locationCity, setLocationCity] = useState<string>('');
+  const [locationZipCodes, setLocationZipCodes] = useState<string[] | null>(null);
+  // Existing A–Z toggle for breed sorting
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  // Tracks if the user has manually toggled the sort control.
+  // Flag to track manual toggle (if needed)
   const [userHasToggledSort, setUserHasToggledSort] = useState<boolean>(false);
   const navigate = useNavigate();
 
@@ -51,8 +54,7 @@ const DogSearchPage: React.FC = () => {
     setLoading(true);
     try {
       const from = (page - 1) * PAGE_SIZE;
-      // If an age filter is applied and the user hasn't toggled the sort manually,
-      // default to age sorting; otherwise use alphabetical sorting by breed.
+      // Use alphabetical breed sort by default (A→Z) if no age filter is applied; otherwise, include age filters.
       const sortParam = (ageMin !== null || ageMax !== null) && !userHasToggledSort
         ? 'age:asc'
         : `breed:${sortOrder}`;
@@ -60,6 +62,7 @@ const DogSearchPage: React.FC = () => {
       if (selectedBreed) params.breeds = [selectedBreed];
       if (ageMin !== null) params.ageMin = ageMin;
       if (ageMax !== null) params.ageMax = ageMax;
+      if (locationZipCodes) params.zipCodes = locationZipCodes;
       const response = await axios.get(`${API_BASE_URL}/dogs/search`, { params, withCredentials: true });
       const searchResults: SearchResults = response.data;
       setPagination(searchResults);
@@ -82,14 +85,32 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  // Call location search API to filter locations by city and extract zip codes.
+  const applyLocationFilter = async () => {
+    try {
+      const filters = { city: locationCity, size: 100, from: 0 };
+      const locationData = await searchLocations(filters);
+      // Extract ZIP codes from the returned locations.
+      const zipCodes = locationData.results.map((loc: any) => loc.zip_code);
+      setLocationZipCodes(zipCodes);
+    } catch (error) {
+      console.error("Error applying location filter:", error);
+    }
+  };
+
+  const clearLocationFilter = () => {
+    setLocationCity('');
+    setLocationZipCodes(null);
+  };
+
   useEffect(() => {
     loadDogs();
     loadBreedNames();
-  }, []); // Load on mount
+  }, []);
 
   useEffect(() => {
     loadDogs(1);
-  }, [selectedBreed, ageMin, ageMax, sortOrder, userHasToggledSort]);
+  }, [selectedBreed, ageMin, ageMax, locationZipCodes, sortOrder, userHasToggledSort]);
 
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
 
@@ -121,37 +142,56 @@ const DogSearchPage: React.FC = () => {
         <div className="w-1/4">
           <h1 className="text-2xl font-bold">Dog Page</h1>
         </div>
-        {/* Center: Breed Search and Age Filters */}
-        <div className="w-1/2 flex items-center justify-center gap-4">
-          <BreedSearchBar breeds={breedNames} onSelect={(breed) => setSelectedBreed(breed)} />
-          <div className="flex gap-2">
+        {/* Center: Breed Search, Age Filters, and Location Filter */}
+        <div className="w-1/2 flex flex-col items-center gap-2">
+          <div className="flex items-center gap-4">
+            <BreedSearchBar breeds={breedNames} onSelect={(breed) => setSelectedBreed(breed)} />
+            <div className="flex gap-2">
+              <input 
+                type="number" 
+                placeholder="Min Age" 
+                value={ageMin !== null ? ageMin : ''} 
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : null;
+                  setAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
+                }} 
+                className="border rounded px-2 py-1 w-20"
+                min="0" 
+                max="14"
+              />
+              <input 
+                type="number" 
+                placeholder="Max Age" 
+                value={ageMax !== null ? ageMax : ''} 
+                onChange={(e) => {
+                  const value = e.target.value ? Number(e.target.value) : null;
+                  setAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
+                }} 
+                className="border rounded px-2 py-1 w-20"
+                min="0" 
+                max="14"
+              />
+            </div>
+          </div>
+          <div className="flex gap-2 items-center">
             <input 
-              type="number" 
-              placeholder="Min Age" 
-              value={ageMin !== null ? ageMin : ''} 
-              onChange={(e) => {
-                const value = e.target.value ? Number(e.target.value) : null;
-                setAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
-              }} 
-              className="border rounded px-2 py-1 w-20"
-              min="0" 
-              max="14"
+              type="text" 
+              placeholder="City" 
+              value={locationCity} 
+              onChange={(e) => setLocationCity(e.target.value)} 
+              className="border rounded px-2 py-1 w-40"
             />
-            <input 
-              type="number" 
-              placeholder="Max Age" 
-              value={ageMax !== null ? ageMax : ''} 
-              onChange={(e) => {
-                const value = e.target.value ? Number(e.target.value) : null;
-                setAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
-              }} 
-              className="border rounded px-2 py-1 w-20"
-              min="0" 
-              max="14"
-            />
+            <button onClick={applyLocationFilter} className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300">
+              Apply Location
+            </button>
+            {locationZipCodes && (
+              <button onClick={clearLocationFilter} className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300">
+                Clear Location
+              </button>
+            )}
           </div>
         </div>
-        {/* Right: Sort Toggle and Logout */}
+        {/* Right: A–Z Toggle and Logout */}
         <div className="w-1/4 flex justify-end items-center gap-2">
           <button 
             onClick={toggleSortOrder} 
