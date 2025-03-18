@@ -6,6 +6,8 @@ import axios from 'axios';
 import { logoutUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import BreedSearchBar from '../components/BreedSearchBar';
+import FavoritesButton from '../components/FavoritesButton'; // Import the FavoritesButton
+import { Dog } from '../types'; // Import the Dog type
 
 interface SearchResults {
   resultIds: string[];
@@ -26,11 +28,18 @@ const DogSearchPage: React.FC = () => {
   const [ageMax, setAgeMax] = useState<number | null>(null);
   const [locationCity, setLocationCity] = useState<string>('');
   const [locationZipCodes, setLocationZipCodes] = useState<string[] | null>(null);
-  // Existing A–Z toggle for breed sorting
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
-  // Flag to track manual toggle (if needed)
   const [userHasToggledSort, setUserHasToggledSort] = useState<boolean>(false);
+  const [favorites, setFavorites] = useState<Dog[]>([]); // State to manage favorites
   const navigate = useNavigate();
+
+  // Load favorites from localStorage on mount
+  useEffect(() => {
+    const storedFavorites = localStorage.getItem("favorites");
+    if (storedFavorites) {
+      setFavorites(JSON.parse(storedFavorites));
+    }
+  }, []);
 
   const getPaginationNumbers = (currentPage: number, totalPages: number): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -54,7 +63,6 @@ const DogSearchPage: React.FC = () => {
     setLoading(true);
     try {
       const from = (page - 1) * PAGE_SIZE;
-      // Use alphabetical breed sort by default (A→Z) if no age filter is applied; otherwise, include age filters.
       const sortParam = (ageMin !== null || ageMax !== null) && !userHasToggledSort
         ? 'age:asc'
         : `breed:${sortOrder}`;
@@ -85,12 +93,10 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  // Call location search API to filter locations by city and extract zip codes.
   const applyLocationFilter = async () => {
     try {
       const filters = { city: locationCity, size: 100, from: 0 };
       const locationData = await searchLocations(filters);
-      // Extract ZIP codes from the returned locations.
       const zipCodes = locationData.results.map((loc: any) => loc.zip_code);
       setLocationZipCodes(zipCodes);
     } catch (error) {
@@ -101,6 +107,21 @@ const DogSearchPage: React.FC = () => {
   const clearLocationFilter = () => {
     setLocationCity('');
     setLocationZipCodes(null);
+  };
+
+  const toggleFavorite = (dog: Dog) => {
+    setFavorites(prev => {
+      let newFavorites;
+      const exists = prev.find(fav => fav.id === dog.id);
+      if (exists) {
+        newFavorites = prev.filter(fav => fav.id !== dog.id); // Remove from favorites
+      } else {
+        newFavorites = [...prev, dog]; // Add to favorites
+      }
+      // Save the updated favorites to localStorage
+      localStorage.setItem("favorites", JSON.stringify(newFavorites));
+      return newFavorites;
+    });
   };
 
   useEffect(() => {
@@ -127,7 +148,6 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  // Toggle the alphabetical sort order (breed toggle).
   const toggleSortOrder = () => {
     setUserHasToggledSort(true);
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -207,6 +227,9 @@ const DogSearchPage: React.FC = () => {
               </span>
             )}
           </button>
+          
+          <FavoritesButton favorites={favorites} /> {/* Display the FavoritesButton */}
+          
           <button 
             onClick={handleLogout}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
@@ -229,7 +252,12 @@ const DogSearchPage: React.FC = () => {
         <>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {dogs.map((dog) => (
-              <DogCard key={dog.id} dog={dog} />
+              <DogCard 
+                key={dog.id} 
+                dog={dog} 
+                isFavorite={!!favorites.find((fav) => fav.id === dog.id)} 
+                onToggleFavorite={toggleFavorite}  // Add the toggleFavorite function here
+              />
             ))}
           </div>
           {pagination && pagination.total > PAGE_SIZE && (

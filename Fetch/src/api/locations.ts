@@ -16,7 +16,7 @@ export const searchLocations = async (filters: {
       filters,
       { withCredentials: true }
     );
-    return response.data; // Expected to return { results: Location[], total: number }
+    return response.data; // Expected: { results: Location[], total: number }
   } catch (error) {
     console.error("Error searching locations:", error);
     throw error;
