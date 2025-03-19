@@ -1,5 +1,7 @@
+// src/pages/LoginForm.tsx
 import React, { useState } from 'react';
 import { loginUser } from '../api/auth';
+import Button from '../components/Button'; 
 
 interface LoginFormProps {
   onLoginSuccess: () => void;
@@ -43,9 +45,9 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
         />
       </div>
       {error && <div className="mb-4 text-red-500">{error}</div>}
-      <button type="submit" className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">
+      <Button type="submit" variant="login" className="w-full">
         Login
-      </button>
+      </Button>
     </form>
   );
 };

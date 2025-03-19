@@ -2,6 +2,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DogCard from '../components/DogCard';
+import Button from '../components/Button'; // Reusable Button component
 import { Dog } from '../types';
 
 const FavoritesPage: React.FC = () => {
@@ -26,24 +27,20 @@ const FavoritesPage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <button 
-        onClick={() => navigate(-1)} 
-        className="mb-4 bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
-      >
+      {/* Back Button */}
+      <Button onClick={() => navigate(-1)} variant="back">
         Back
-      </button>
+      </Button>
       <h1 className="text-2xl font-bold mb-4">Your Favorites</h1>
       {favorites.length === 0 ? (
         <p>No favorites selected.</p>
       ) : (
         <>
-          <button 
-            onClick={handleGetMatch} 
-            className="mb-4 bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
-          >
+          {/* Get a Match Button */}
+          <Button onClick={handleGetMatch} variant="match">
             Get a Match
-          </button>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          </Button>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
             {favorites.map((dog) => (
               <DogCard 
                 key={dog.id} 
@@ -55,7 +52,6 @@ const FavoritesPage: React.FC = () => {
           </div>
         </>
       )}
-
       {matchDog && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white p-6 rounded shadow-lg text-center">
@@ -65,12 +61,9 @@ const FavoritesPage: React.FC = () => {
               isFavorite={true} 
               onToggleFavorite={() => {}} 
             />
-            <button 
-              onClick={closeMatch} 
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-            >
+            <Button onClick={closeMatch} variant="close" className="mt-4">
               Close
-            </button>
+            </Button>
           </div>
         </div>
       )}

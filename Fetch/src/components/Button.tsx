@@ -2,32 +2,36 @@
 import React from 'react';
 
 interface ButtonProps {
-  onClick: () => void;
+  onClick?: () => void;
   children: React.ReactNode;
   disabled?: boolean;
   /**
    * Variant names:
-   * - "logout": for the Logout button.
-   * - "fav": for the Favorites button.
-   * - "filter": for the Filter button in the nav.
-   * - "sortBreed": for the sort buttons used for breed (e.g. A → Z).
-   * - "sortLocation": for buttons used in location filtering (e.g. Apply/Clear in city filter).
+   * - "logout": for logout buttons.
+   * - "fav": for favorites buttons.
+   * - "filter": for filter buttons in nav.
+   * - "sortBreed": for sort-by-breed buttons.
+   * - "sortLocation": for location filter buttons.
+   * - "back": for back buttons.
+   * - "match": for the Get a Match button.
+   * - "close": for the Close button in modals.
+   * - "login": for the Login button.
    */
-  variant?: 'logout' | 'fav' | 'filter' | 'sortBreed' | 'sortLocation';
+  variant?: 'logout' | 'fav' | 'filter' | 'sortBreed' | 'sortLocation' | 'back' | 'match' | 'close' | 'login';
   className?: string;
+  type?: "button" | "submit" | "reset";
 }
 
 const Button: React.FC<ButtonProps> = ({
-  onClick,
+  onClick = () => {},
   children,
   disabled = false,
-  variant = 'sortBreed',
+  variant = 'fav',
   className = '',
+  type = "button"
 }) => {
-  // Base classes for smooth transitions and rounded corners.
   let baseClasses = "rounded transition-all duration-300 ease-in-out ";
 
-  // Variant-specific classes
   switch (variant) {
     case 'logout':
       baseClasses += "bg-red-500 text-white hover:bg-red-600 px-4 py-2";
@@ -44,12 +48,25 @@ const Button: React.FC<ButtonProps> = ({
     case 'sortLocation':
       baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-2 py-1 text-xs";
       break;
+    case 'back':
+      baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2";
+      break;
+    case 'match':
+      baseClasses += "bg-green-500 text-white hover:bg-green-600 px-4 py-2";
+      break;
+    case 'close':
+      baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-4 py-2";
+      break;
+    case 'login':
+      baseClasses += "bg-indigo-500 text-white hover:bg-indigo-600 px-4 py-2";
+      break;
     default:
       baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-4 py-2";
   }
 
   return (
     <button
+      type={type}
       onClick={onClick}
       disabled={disabled}
       className={`${baseClasses} ${disabled ? "opacity-50 cursor-not-allowed" : ""} ${className}`}
