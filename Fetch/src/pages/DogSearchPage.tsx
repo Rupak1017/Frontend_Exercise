@@ -1,13 +1,14 @@
+// src/pages/DogSearchPage.tsx
 import React, { useEffect, useState } from 'react';
 import DogCard from '../components/DogCard';
-import { fetchDogsDetails, fetchDogsSearch } from '../api/dogs';
+import { fetchDogsDetails } from '../api/dogs';
 import { searchLocations } from '../api/locations';
 import axios from 'axios';
 import { logoutUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import BreedSearchBar from '../components/BreedSearchBar';
-import FavoritesButton from '../components/FavoritesButton'; // Import the FavoritesButton
-import { Dog } from '../types'; // Import the Dog type
+import FavoritesButton from '../components/FavoritesButton';
+import { Dog } from '../types';
 
 interface SearchResults {
   resultIds: string[];
@@ -18,7 +19,7 @@ const PAGE_SIZE = 25;
 const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
 const DogSearchPage: React.FC = () => {
-  const [dogs, setDogs] = useState<any[]>([]);
+  const [dogs, setDogs] = useState<Dog[]>([]);
   const [pagination, setPagination] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
@@ -30,16 +31,34 @@ const DogSearchPage: React.FC = () => {
   const [locationZipCodes, setLocationZipCodes] = useState<string[] | null>(null);
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [userHasToggledSort, setUserHasToggledSort] = useState<boolean>(false);
-  const [favorites, setFavorites] = useState<Dog[]>([]); // State to manage favorites
+  const [favorites, setFavorites] = useState<Dog[]>([]);
+  const [showFilters, setShowFilters] = useState<boolean>(false);
   const navigate = useNavigate();
 
-  // Load favorites from localStorage on mount
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
       setFavorites(JSON.parse(storedFavorites));
     }
   }, []);
+
+  const updateFavoritesStorage = (newFavorites: Dog[]) => {
+    localStorage.setItem("favorites", JSON.stringify(newFavorites));
+  };
+
+  const toggleFavorite = (dog: Dog) => {
+    setFavorites(prev => {
+      let newFavorites;
+      const exists = prev.find(fav => fav.id === dog.id);
+      if (exists) {
+        newFavorites = prev.filter(fav => fav.id !== dog.id);
+      } else {
+        newFavorites = [...prev, dog];
+      }
+      updateFavoritesStorage(newFavorites);
+      return newFavorites;
+    });
+  };
 
   const getPaginationNumbers = (currentPage: number, totalPages: number): (number | string)[] => {
     const pages: (number | string)[] = [];
@@ -97,7 +116,11 @@ const DogSearchPage: React.FC = () => {
     try {
       const filters = { city: locationCity, size: 100, from: 0 };
       const locationData = await searchLocations(filters);
-      const zipCodes = locationData.results.map((loc: any) => loc.zip_code);
+      const filteredResults = locationData.results.filter(
+        (loc: any) => loc.city.toLowerCase() === locationCity.toLowerCase()
+      );
+      const zipCodes = filteredResults.map((loc: any) => loc.zip_code);
+      console.log("Filtered ZIP codes:", zipCodes);
       setLocationZipCodes(zipCodes);
     } catch (error) {
       console.error("Error applying location filter:", error);
@@ -107,21 +130,6 @@ const DogSearchPage: React.FC = () => {
   const clearLocationFilter = () => {
     setLocationCity('');
     setLocationZipCodes(null);
-  };
-
-  const toggleFavorite = (dog: Dog) => {
-    setFavorites(prev => {
-      let newFavorites;
-      const exists = prev.find(fav => fav.id === dog.id);
-      if (exists) {
-        newFavorites = prev.filter(fav => fav.id !== dog.id); // Remove from favorites
-      } else {
-        newFavorites = [...prev, dog]; // Add to favorites
-      }
-      // Save the updated favorites to localStorage
-      localStorage.setItem("favorites", JSON.stringify(newFavorites));
-      return newFavorites;
-    });
   };
 
   useEffect(() => {
@@ -134,6 +142,9 @@ const DogSearchPage: React.FC = () => {
   }, [selectedBreed, ageMin, ageMax, locationZipCodes, sortOrder, userHasToggledSort]);
 
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
+  
+  // <<<< ADDED: Define paginationNumbers variable >>>>
+  const paginationNumbers = totalPages ? getPaginationNumbers(currentPage, totalPages) : [];
 
   const handleLogout = async () => {
     try {
@@ -148,96 +159,121 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  const toggleSortOrder = () => {
-    setUserHasToggledSort(true);
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-  };
-
-  const paginationNumbers = totalPages ? getPaginationNumbers(currentPage, totalPages) : [];
-
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-      <header className="flex justify-between items-center mb-6">
+      {/* Nav Bar */}
+      <header className="flex justify-between items-center mb-4">
         {/* Left: Logo */}
         <div className="w-1/4">
           <h1 className="text-2xl font-bold">Dog Page</h1>
         </div>
-        {/* Center: Breed Search, Age Filters, and Location Filter */}
-        <div className="w-1/2 flex flex-col items-center gap-2">
-          <div className="flex items-center gap-4">
-            <BreedSearchBar breeds={breedNames} onSelect={(breed) => setSelectedBreed(breed)} />
-            <div className="flex gap-2">
-              <input 
-                type="number" 
-                placeholder="Min Age" 
-                value={ageMin !== null ? ageMin : ''} 
-                onChange={(e) => {
-                  const value = e.target.value ? Number(e.target.value) : null;
-                  setAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
-                }} 
-                className="border rounded px-2 py-1 w-20"
-                min="0" 
-                max="14"
-              />
-              <input 
-                type="number" 
-                placeholder="Max Age" 
-                value={ageMax !== null ? ageMax : ''} 
-                onChange={(e) => {
-                  const value = e.target.value ? Number(e.target.value) : null;
-                  setAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
-                }} 
-                className="border rounded px-2 py-1 w-20"
-                min="0" 
-                max="14"
-              />
-            </div>
-          </div>
-          <div className="flex gap-2 items-center">
-            <input 
-              type="text" 
-              placeholder="City" 
-              value={locationCity} 
-              onChange={(e) => setLocationCity(e.target.value)} 
-              className="border rounded px-2 py-1 w-40"
-            />
-            <button onClick={applyLocationFilter} className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300">
-              Apply Location
-            </button>
-            {locationZipCodes && (
-              <button onClick={clearLocationFilter} className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300">
-                Clear Location
-              </button>
-            )}
-          </div>
+        {/* Center: Search Bar for Breed */}
+        <div className="w-1/2">
+          <BreedSearchBar 
+            breeds={breedNames} 
+            onSelect={(breed) => setSelectedBreed(breed)}
+            placeholder="Search by Breed" 
+          />
         </div>
-        {/* Right: A–Z Toggle and Logout */}
-        <div className="w-1/4 flex justify-end items-center gap-2">
+        {/* Right: Filter Button, Favorites, Logout */}
+        <div className="w-1/4 flex justify-end items-center gap-2 relative">
           <button 
-            onClick={toggleSortOrder} 
-            className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300"
+            onClick={() => setShowFilters(!showFilters)}
+            className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 flex items-center gap-1"
           >
-            {sortOrder === 'asc' ? (
-              <span>
-                A → Z <i className="ri-arrow-up-s-line align-middle"></i>
-              </span>
-            ) : (
-              <span>
-                Z → A <i className="ri-arrow-down-s-line align-middle"></i>
-              </span>
-            )}
+            <i className="ri-filter-3-line"></i> Filter
           </button>
-          
-          <FavoritesButton favorites={favorites} /> {/* Display the FavoritesButton */}
-          
+          <FavoritesButton favorites={favorites} />
           <button 
             onClick={handleLogout}
             className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
           >
             Logout
           </button>
+          {/* Filter Dropdown */}
+          {showFilters && (
+            <div className="absolute right-36 top-full mt-2 z-50 transition-all duration-900 ease-in-out bg-white border rounded p-2 shadow w-auto">
+              {/* Sort by Breed */}
+              <div className="mb-2">
+                <h3 className="font-bold text-sm mb-1">Sort by Breed</h3>
+                <div className="flex gap-2">
+                  <button 
+                    onClick={() => { setUserHasToggledSort(true); setSortOrder('asc'); }}
+                    className={`px-2 py-1 text-xs rounded ${sortOrder === 'asc' ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                  >
+                    A → Z
+                  </button>
+                  <button 
+                    onClick={() => { setUserHasToggledSort(true); setSortOrder('desc'); }}
+                    className={`px-2 py-1 text-xs rounded ${sortOrder === 'desc' ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                  >
+                    Z → A
+                  </button>
+                </div>
+              </div>
+              {/* Age Filter */}
+              <div className="mb-2">
+                <h3 className="font-bold text-sm mb-1">Age</h3>
+                <div className="flex gap-2">
+                  <input 
+                    type="number" 
+                    placeholder="Min" 
+                    value={ageMin !== null ? ageMin : ''} 
+                    onChange={(e) => {
+                      const value = e.target.value ? Number(e.target.value) : null;
+                      setAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
+                    }} 
+                    className="border rounded px-2 py-1 w-16 text-xs"
+                    min="0" 
+                    max="14"
+                  />
+                  <input 
+                    type="number" 
+                    placeholder="Max" 
+                    value={ageMax !== null ? ageMax : ''} 
+                    onChange={(e) => {
+                      const value = e.target.value ? Number(e.target.value) : null;
+                      setAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
+                    }} 
+                    className="border rounded px-2 py-1 w-16 text-xs"
+                    min="0" 
+                    max="14"
+                  />
+                </div>
+              </div>
+              {/* City Filter */}
+              <div>
+                <h3 className="font-bold text-sm mb-1">City</h3>
+                <div className="flex gap-2 items-center">
+                  <input 
+                    type="text" 
+                    placeholder="City" 
+                    value={locationCity} 
+                    onChange={(e) => setLocationCity(e.target.value)} 
+                    className="border rounded px-2 py-1 w-24 text-xs"
+                  />
+                  {locationZipCodes ? (
+                    <button 
+                      onClick={clearLocationFilter} 
+                      className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded hover:bg-gray-300"
+                    >
+                      Clear
+                    </button>
+                  ) : (
+                    <button 
+                      onClick={applyLocationFilter} 
+                      className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded hover:bg-gray-300"
+                    >
+                      Apply
+                    </button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </header>
+
       {selectedBreed && (
         <div className="mb-4">
           <h2 className="text-xl font-bold">Search Results for: {selectedBreed}</h2>
@@ -256,7 +292,7 @@ const DogSearchPage: React.FC = () => {
                 key={dog.id} 
                 dog={dog} 
                 isFavorite={!!favorites.find((fav) => fav.id === dog.id)} 
-                onToggleFavorite={toggleFavorite}  // Add the toggleFavorite function here
+                onToggleFavorite={toggleFavorite}
               />
             ))}
           </div>
