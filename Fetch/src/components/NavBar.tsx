@@ -1,4 +1,3 @@
-// src/components/NavBar.tsx
 import React from 'react';
 import BreedSearchBar from './BreedSearchBar';
 import Button from './Button';
@@ -47,13 +46,13 @@ const NavBar: React.FC<NavBarProps> = ({
   onLogout,
 }) => {
   return (
-    <header className="flex justify-between items-center mb-4">
-      {/* Left: Logo */}
-      <div className="w-1/4">
-        <h1 className="text-2xl font-bold">Dog Page</h1>
+    <header className="relative mt-6 mb-4 border-b border-black pb-4">
+      {/* Left: Logo/Text */}
+      <div className="absolute top-0 left-0">
+        <h1 className="text-xl font-bold">Dog Page</h1>
       </div>
-      {/* Center: Search Bar for Breed */}
-      <div className="w-1/2">
+      {/* Center: Search Bar */}
+      <div className="flex justify-center">
         <BreedSearchBar 
           breeds={breedNames} 
           onSelect={onBreedSelect}
@@ -61,7 +60,7 @@ const NavBar: React.FC<NavBarProps> = ({
         />
       </div>
       {/* Right: Filter, Favorites, Logout */}
-      <div className="w-1/4 flex justify-end items-center gap-2 relative">
+      <div className="absolute top-0 right-0 flex items-center gap-4">
         <Button onClick={onToggleFilters} variant="filter">
           <i className="ri-filter-3-line"></i> Filter
         </Button>
@@ -71,22 +70,22 @@ const NavBar: React.FC<NavBarProps> = ({
         <Button onClick={onLogout} variant="logout">
           Logout
         </Button>
-        {showFilters && (
-          <FilterDropdown
-            sortOrder={sortOrder}
-            onSetSortOrder={onSetSortOrder}
-            ageMin={ageMin}
-            ageMax={ageMax}
-            onSetAgeMin={onSetAgeMin}
-            onSetAgeMax={onSetAgeMax}
-            locationCity={locationCity}
-            onSetLocationCity={onSetLocationCity}
-            applyLocationFilter={applyLocationFilter}
-            clearLocationFilter={clearLocationFilter}
-            locationZipCodes={locationZipCodes}
-          />
-        )}
       </div>
+      {showFilters && (
+        <FilterDropdown
+          sortOrder={sortOrder}
+          onSetSortOrder={onSetSortOrder}
+          ageMin={ageMin}
+          ageMax={ageMax}
+          onSetAgeMin={onSetAgeMin}
+          onSetAgeMax={onSetAgeMax}
+          locationCity={locationCity}
+          onSetLocationCity={onSetLocationCity}
+          applyLocationFilter={applyLocationFilter}
+          clearLocationFilter={clearLocationFilter}
+          locationZipCodes={locationZipCodes}
+        />
+      )}
     </header>
   );
 };

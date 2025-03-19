@@ -1,4 +1,3 @@
-// src/pages/DogSearchPage.tsx
 import React, { useEffect, useState } from 'react';
 import { fetchDogsDetails } from '../api/dogs';
 import { searchLocations } from '../api/locations';
@@ -8,13 +7,14 @@ import { useNavigate } from 'react-router-dom';
 import NavBar from '../components/NavBar';
 import DogList from '../components/DogList';
 import { Dog } from '../types';
+import Button from '../components/Button';
 
 interface SearchResults {
   resultIds: string[];
   total: number;
 }
 
-const PAGE_SIZE = 18;
+const PAGE_SIZE = 20;
 const API_BASE_URL = 'https://frontend-take-home-service.fetch.com';
 
 const DogSearchPage: React.FC = () => {
@@ -171,7 +171,8 @@ const DogSearchPage: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
+<div className="min-h-screen bg-white text-black w-[85%] mx-auto px-4 p-6">
+
       <NavBar
         breedNames={breedNames}
         onBreedSelect={setSelectedBreed}

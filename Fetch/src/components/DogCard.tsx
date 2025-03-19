@@ -1,4 +1,3 @@
-// src/components/DogCard.tsx
 import React, { useState, useEffect } from 'react';
 import { Dog } from '../types';
 
@@ -21,20 +20,33 @@ const DogCard: React.FC<DogCardProps> = ({ dog, isFavorite, onToggleFavorite }) 
   };
 
   return (
-    <div className="border rounded shadow p-4 flex flex-col items-center relative">
-      <img src={dog.img} alt={dog.name} className="w-32 h-32 object-cover rounded mb-4" />
-      <button onClick={handleToggle} className="absolute top-2 right-2">
-        {favorite ? (
-          <i className="ri-heart-fill text-red-500 text-xl"></i>
-        ) : (
-          <i className="ri-heart-line text-gray-500 text-xl"></i>
-        )}
-      </button>
-      <div className="text-center">
-        <h2 className="font-bold text-lg">{dog.name}</h2>
-        <p>Age: {dog.age}</p>
-        <p>Breed: {dog.breed}</p>
-        <p>ZIP: {dog.zip_code}</p>
+    <div className="border rounded shadow p-4 w-72">
+      <img 
+        src={dog.img} 
+        alt={dog.name} 
+        className="w-full h-52 object-cover rounded mb-4" 
+      />
+      {/* Top row: Name and Age */}
+      <div className="flex justify-between items-center">
+        <h2 className="font-bold text-lg">Name: {dog.name}</h2>
+        <h2 className="font-bold text-lg">Age: {dog.age}</h2>
+      </div>
+      {/* Bottom row: Breed, Heart Icon, and ZIP */}
+      <div className='flex flex-row justify-between'>
+      <div className="mt-4 flex justify-between flex-col ">
+        <p className="font-semibold text-sm">Breed: {dog.breed}</p>
+                <p className="font-semibold text-sm">ZIP: {dog.zip_code}</p>
+      </div>
+      <button 
+          onClick={handleToggle} 
+          className="transition transform duration-300 hover:scale-110 mx-2"
+        >
+          {favorite ? (
+            <i className="ri-heart-fill text-red-500 text-2xl"></i>
+          ) : (
+            <i className="ri-heart-line text-gray-500 text-2xl"></i>
+          )}
+        </button>
       </div>
     </div>
   );
