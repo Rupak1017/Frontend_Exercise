@@ -7,7 +7,7 @@ import axios from 'axios';
 import { logoutUser } from '../api/auth';
 import { useNavigate } from 'react-router-dom';
 import BreedSearchBar from '../components/BreedSearchBar';
-import FavoritesButton from '../components/FavoritesButton';
+import Button from '../components/Button'; // Using our reusable Button component
 import { Dog } from '../types';
 
 interface SearchResults {
@@ -23,18 +23,30 @@ const DogSearchPage: React.FC = () => {
   const [pagination, setPagination] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState<number>(1);
+  
   const [selectedBreed, setSelectedBreed] = useState<string | null>(null);
   const [breedNames, setBreedNames] = useState<string[]>([]);
+  
   const [ageMin, setAgeMin] = useState<number | null>(null);
   const [ageMax, setAgeMax] = useState<number | null>(null);
+  
+  // Location filter (using city)
   const [locationCity, setLocationCity] = useState<string>('');
   const [locationZipCodes, setLocationZipCodes] = useState<string[] | null>(null);
+  
+  // Sorting state
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
   const [userHasToggledSort, setUserHasToggledSort] = useState<boolean>(false);
+  
+  // Favorites state (persisted via localStorage)
   const [favorites, setFavorites] = useState<Dog[]>([]);
+  
+  // Show/hide filter dropdown
   const [showFilters, setShowFilters] = useState<boolean>(false);
+  
   const navigate = useNavigate();
 
+  // Load persisted favorites on mount.
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -142,8 +154,6 @@ const DogSearchPage: React.FC = () => {
   }, [selectedBreed, ageMin, ageMax, locationZipCodes, sortOrder, userHasToggledSort]);
 
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
-  
-  // <<<< ADDED: Define paginationNumbers variable >>>>
   const paginationNumbers = totalPages ? getPaginationNumbers(currentPage, totalPages) : [];
 
   const handleLogout = async () => {
@@ -175,21 +185,18 @@ const DogSearchPage: React.FC = () => {
             placeholder="Search by Breed" 
           />
         </div>
-        {/* Right: Filter Button, Favorites, Logout */}
+        {/* Right: Filter, Favorites, Logout */}
         <div className="w-1/4 flex justify-end items-center gap-2 relative">
-          <button 
-            onClick={() => setShowFilters(!showFilters)}
-            className="bg-gray-200 text-gray-700 px-3 py-2 rounded hover:bg-gray-300 flex items-center gap-1"
-          >
+          <Button onClick={() => setShowFilters(!showFilters)} variant="filter">
             <i className="ri-filter-3-line"></i> Filter
-          </button>
-          <FavoritesButton favorites={favorites} />
-          <button 
-            onClick={handleLogout}
-            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-          >
+          </Button>
+          <Button onClick={() => navigate('/favorites')} variant="fav">
+            Favorites
+          </Button>
+          <Button onClick={handleLogout} variant="logout">
             Logout
-          </button>
+          </Button>
+
           {/* Filter Dropdown */}
           {showFilters && (
             <div className="absolute right-36 top-full mt-2 z-50 transition-all duration-900 ease-in-out bg-white border rounded p-2 shadow w-auto">
@@ -197,18 +204,12 @@ const DogSearchPage: React.FC = () => {
               <div className="mb-2">
                 <h3 className="font-bold text-sm mb-1">Sort by Breed</h3>
                 <div className="flex gap-2">
-                  <button 
-                    onClick={() => { setUserHasToggledSort(true); setSortOrder('asc'); }}
-                    className={`px-2 py-1 text-xs rounded ${sortOrder === 'asc' ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}
-                  >
+                  <Button onClick={() => { setUserHasToggledSort(true); setSortOrder('asc'); }} variant="sortBreed">
                     A → Z
-                  </button>
-                  <button 
-                    onClick={() => { setUserHasToggledSort(true); setSortOrder('desc'); }}
-                    className={`px-2 py-1 text-xs rounded ${sortOrder === 'desc' ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}
-                  >
+                  </Button>
+                  <Button onClick={() => { setUserHasToggledSort(true); setSortOrder('desc'); }} variant="sortBreed">
                     Z → A
-                  </button>
+                  </Button>
                 </div>
               </div>
               {/* Age Filter */}
@@ -253,19 +254,13 @@ const DogSearchPage: React.FC = () => {
                     className="border rounded px-2 py-1 w-24 text-xs"
                   />
                   {locationZipCodes ? (
-                    <button 
-                      onClick={clearLocationFilter} 
-                      className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded hover:bg-gray-300"
-                    >
+                    <Button onClick={clearLocationFilter} variant="sortLocation">
                       Clear
-                    </button>
+                    </Button>
                   ) : (
-                    <button 
-                      onClick={applyLocationFilter} 
-                      className="bg-gray-200 text-gray-700 px-2 py-1 text-xs rounded hover:bg-gray-300"
-                    >
+                    <Button onClick={applyLocationFilter} variant="sortLocation">
                       Apply
-                    </button>
+                    </Button>
                   )}
                 </div>
               </div>
@@ -277,9 +272,9 @@ const DogSearchPage: React.FC = () => {
       {selectedBreed && (
         <div className="mb-4">
           <h2 className="text-xl font-bold">Search Results for: {selectedBreed}</h2>
-          <button onClick={() => { setSelectedBreed(null); loadDogs(1); }} className="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+          <Button onClick={() => { setSelectedBreed(null); loadDogs(1); }} variant="fav">
             Reset to Default
-          </button>
+          </Button>
         </div>
       )}
       {loading ? (
@@ -298,23 +293,29 @@ const DogSearchPage: React.FC = () => {
           </div>
           {pagination && pagination.total > PAGE_SIZE && (
             <div className="flex justify-center items-center space-x-2 mt-6">
-              <button onClick={() => loadDogs(1)} disabled={currentPage === 1} className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50">
+              <Button onClick={() => loadDogs(1)} disabled={currentPage === 1} variant="fav">
                 {"<<"}
-              </button>
-              <button onClick={() => loadDogs(currentPage - 1)} disabled={currentPage === 1} className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50">
+              </Button>
+              <Button onClick={() => loadDogs(currentPage - 1)} disabled={currentPage === 1} variant="fav">
                 {"<"}
-              </button>
+              </Button>
               {paginationNumbers.map((page, index) => (
-                <button key={index} onClick={() => typeof page === "number" && loadDogs(page)} disabled={page === currentPage} className={`px-3 py-1 rounded ${page === currentPage ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}>
+                <Button 
+                  key={index} 
+                  onClick={() => typeof page === "number" && loadDogs(page)} 
+                  disabled={page === currentPage} 
+                  variant="fav"
+                  className={`px-3 py-1 rounded ${page === currentPage ? "bg-blue-700 text-white" : "bg-blue-500 text-white hover:bg-blue-600"}`}
+                >
                   {page}
-                </button>
+                </Button>
               ))}
-              <button onClick={() => loadDogs(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0} className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50">
+              <Button onClick={() => loadDogs(currentPage + 1)} disabled={currentPage === totalPages || totalPages === 0} variant="fav">
                 {">"}
-              </button>
-              <button onClick={() => loadDogs(totalPages)} disabled={currentPage === totalPages || totalPages === 0} className="px-3 py-1 bg-blue-500 text-white rounded disabled:opacity-50">
+              </Button>
+              <Button onClick={() => loadDogs(totalPages)} disabled={currentPage === totalPages || totalPages === 0} variant="fav">
                 {">>"}
-              </button>
+              </Button>
             </div>
           )}
         </>
