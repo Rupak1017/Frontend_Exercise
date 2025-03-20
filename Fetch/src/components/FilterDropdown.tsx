@@ -1,5 +1,3 @@
-// This component provides filters for sorting and narrowing down items based on breed, age, and city.
-// It is used to let the user easily adjust the view with a friendly dropdown interface.
 import React from 'react';
 import Button from './Button';
 
@@ -18,7 +16,7 @@ interface FilterDropdownProps {
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
-  
+  sortOrder,
   onSetSortOrder,
   ageMin,
   ageMax,
@@ -33,6 +31,15 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   // Determine if a filter has been applied based on zip codes in the location filter.
   const isLocationApplied = locationZipCodes !== null && locationZipCodes.length > 0;
 
+  // Reset only the age fields to null.
+  // The parent's useEffect watching ageMin/ageMax will reload dogs with no age filter.
+  const handleResetAgeFilter = () => {
+    onSetAgeMin(null);
+    onSetAgeMax(null);
+    // If you also want to ensure the sort is forced back to "asc", uncomment below:
+    // onSetSortOrder('asc');
+  };
+
   return (
     <div
       className="
@@ -41,8 +48,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         right-0 md:right-36
       "
     >
-      {/* ---------------------- Sort by Breed Section ----------------------
-          This section allows the user to choose sorting order by breed (A -> Z or Z -> A). */}
+      {/* ---------------------- Sort by Breed Section ---------------------- */}
       <div className="mb-2">
         <h3 className="font-bold text-sm mb-1">Sort by Breed</h3>
         <div className="flex gap-7">
@@ -55,18 +61,17 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         </div>
       </div>
 
-      {/* ---------------------- Age Filter Section ----------------------
-          Lets the user set minimum and maximum age values. */}
+      {/* ---------------------- Age Filter Section ---------------------- */}
       <div className="mb-2">
         <h3 className="font-bold text-sm mb-1">Age</h3>
-        <div className="flex gap-2">
+        <div className="flex items-center gap-2">
           <input
             type="number"
             placeholder="Min"
             value={ageMin !== null ? ageMin : ''}
             onChange={(e) => {
-              const value = e.target.value ? Number(e.target.value) : null;
-              onSetAgeMin(value !== null ? Math.max(0, Math.min(14, value)) : null);
+              const val = e.target.value ? Number(e.target.value) : null;
+              onSetAgeMin(val !== null ? Math.max(0, Math.min(14, val)) : null);
             }}
             className="border rounded px-2 py-1 w-16 text-xs"
             min="0"
@@ -77,19 +82,28 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
             placeholder="Max"
             value={ageMax !== null ? ageMax : ''}
             onChange={(e) => {
-              const value = e.target.value ? Number(e.target.value) : null;
-              onSetAgeMax(value !== null ? Math.max(0, Math.min(14, value)) : null);
+              const val = e.target.value ? Number(e.target.value) : null;
+              onSetAgeMax(val !== null ? Math.max(0, Math.min(14, val)) : null);
             }}
             className="border rounded px-2 py-1 w-16 text-xs"
             min="0"
             max="14"
           />
+
+          {/* Show the red cross only if either ageMin or ageMax is non-null */}
+          {(ageMin !== null || ageMax !== null) && (
+            <button
+              onClick={handleResetAgeFilter}
+              className="text-red-500 hover:text-red-600"
+              title="Reset Age Filter"
+            >
+              <i className="ri-close-circle-line text-lg" />
+            </button>
+          )}
         </div>
       </div>
 
-      {/* ---------------------- City Filter Section ----------------------
-          Provides an input field to filter by city. The related button will either apply
-          the filter or clear it, depending on whether a filter was already applied. */}
+      {/* ---------------------- City Filter Section ---------------------- */}
       <div>
         <h3 className="font-bold text-sm mb-1">City</h3>
         <div className="flex gap-2 items-center">
