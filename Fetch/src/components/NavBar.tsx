@@ -29,7 +29,6 @@ interface NavBarProps {
 const NavBar: React.FC<NavBarProps> = ({
   breedNames,
   onBreedSelect,
-  selectedBreed,
   showFilters,
   onToggleFilters,
   sortOrder,
