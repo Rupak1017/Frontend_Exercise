@@ -8,13 +8,17 @@ Browse lovable fur buddies looking for a home.
 
 Match with the perfect pet based on your preferences.
 
+Protected routes for a secure and seamless adoption experience.
+
 Interactive, responsive, and built with React + TypeScript!
+
+
 
 🛠 Prerequisites
 
 Before you start, make sure you have:
 
-✅ Node.js installed – Get it here✅ Git installed – If not, grab it from here✅ A browser (because, well... you need to see the magic happen ✨)
+✅ Node.js installed , Git installed , A browser (because, well... you need to see the magic happen ✨)
 
 🔧 Installation Guide
 
@@ -42,4 +46,4 @@ Tailwind CSS for styling
 Chatbase for Virtual Chatbot
 
 
-Made with 🧡 by pet lovers, for pet lovers.
+Made with 🧡 by pet lover, for pet lovers.

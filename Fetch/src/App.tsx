@@ -7,9 +7,9 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   return (
-    // Router wraps the app to handle navigation.
+    
     <Router>
-      {/* Routes renders the appropriate page based on the URL */}
+     
       <Routes>
         {/* Public route: login page, accessible by everyone */}
         <Route path="/" element={<LoginPage />} />
