@@ -1,4 +1,5 @@
-// src/components/FilterDropdown.tsx
+// This component provides filters for sorting and narrowing down items based on breed, age, and city.
+// It is used to let the user easily adjust the view with a friendly dropdown interface.
 import React from 'react';
 import Button from './Button';
 
@@ -29,7 +30,7 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
   clearLocationFilter,
   locationZipCodes,
 }) => {
-  // Check if a location filter has been applied
+  // Determine if a filter has been applied based on zip codes in the location filter.
   const isLocationApplied = locationZipCodes !== null && locationZipCodes.length > 0;
 
   return (
@@ -40,7 +41,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         right-0 md:right-36
       "
     >
-      {/* Sort by Breed Section */}
+      {/* ---------------------- Sort by Breed Section ----------------------
+          This section allows the user to choose sorting order by breed (A -> Z or Z -> A). */}
       <div className="mb-2">
         <h3 className="font-bold text-sm mb-1">Sort by Breed</h3>
         <div className="flex gap-7">
@@ -53,7 +55,8 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         </div>
       </div>
 
-      {/* Age Filter Section */}
+      {/* ---------------------- Age Filter Section ----------------------
+          Lets the user set minimum and maximum age values. */}
       <div className="mb-2">
         <h3 className="font-bold text-sm mb-1">Age</h3>
         <div className="flex gap-2">
@@ -84,7 +87,9 @@ const FilterDropdown: React.FC<FilterDropdownProps> = ({
         </div>
       </div>
 
-      {/* City Filter Section */}
+      {/* ---------------------- City Filter Section ----------------------
+          Provides an input field to filter by city. The related button will either apply
+          the filter or clear it, depending on whether a filter was already applied. */}
       <div>
         <h3 className="font-bold text-sm mb-1">City</h3>
         <div className="flex gap-2 items-center">

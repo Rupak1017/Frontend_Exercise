@@ -7,9 +7,13 @@ import ProtectedRoute from './components/ProtectedRoute';
 
 const App: React.FC = () => {
   return (
+    // Router wraps the app to handle navigation.
     <Router>
+      {/* Routes renders the appropriate page based on the URL */}
       <Routes>
+        {/* Public route: login page, accessible by everyone */}
         <Route path="/" element={<LoginPage />} />
+        {/* Protected route: only logged in users can access the dog search */}
         <Route 
           path="/search" 
           element={
@@ -18,6 +22,7 @@ const App: React.FC = () => {
             </ProtectedRoute>
           } 
         />
+        {/* Protected route: only logged in users can access favorites */}
         <Route 
           path="/favorites" 
           element={

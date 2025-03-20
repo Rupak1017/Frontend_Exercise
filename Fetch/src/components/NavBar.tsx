@@ -46,8 +46,8 @@ const NavBar: React.FC<NavBarProps> = ({
   onFavoritesClick,
   onLogout,
 }) => {
-  // Controls the mobile hamburger menu dropdown
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  // This state controls the visibility of the mobile hamburger menu.
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false); // Toggle mobile menu
 
   return (
     <header className="relative mt-6 mb-4 border-b border-black pb-4 min-h-[60px]">
@@ -55,6 +55,7 @@ const NavBar: React.FC<NavBarProps> = ({
         ===========================
         DESKTOP VIEW (md and above)
         ===========================
+        This section renders the desktop navigation details.
       */}
       <div className="hidden md:block">
         {/* Left: Logo/Text (absolute) */}
@@ -91,9 +92,10 @@ const NavBar: React.FC<NavBarProps> = ({
         =======================
         MOBILE VIEW (below md)
         =======================
+        Mobile view includes a simpler header with a hamburger menu.
       */}
       <div className="md:hidden">
-        {/* Top row: Logo (left) + Hamburger (right) */}
+        {/* Top row: Logo (left) and hamburger menu (right) */}
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             Fur <span className="text-yellow-400">Buddy</span>
@@ -109,6 +111,7 @@ const NavBar: React.FC<NavBarProps> = ({
               <i className="ri-menu-line"></i>
             </Button>
             {mobileMenuOpen && (
+              // When mobileMenuOpen is true, display the dropdown menu
               <div
                 className="absolute right-0 mt-2 bg-white border border-gray-200 rounded shadow-lg w-36 z-50
                            transition-all duration-300 transform origin-top-right"
@@ -131,15 +134,14 @@ const NavBar: React.FC<NavBarProps> = ({
                   variant="logout"
                   className="w-full text-left px-2 py-1 text-sm flex items-center gap-1"
                 >
-                  <i className="ri-logout-box-line "></i> Logout
-                  
+                  <i className="ri-logout-box-line"></i> Logout
                 </Button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Second row: Search Bar (left) + Filter (right) */}
+        {/* Second row: Contains the search bar for breeds and filter button */}
         <div className="mt-4 flex items-center justify-between gap-2">
           <div className="flex-1">
             <BreedSearchBar
@@ -157,10 +159,7 @@ const NavBar: React.FC<NavBarProps> = ({
         </div>
       </div>
 
-      {/*
-        Filter Dropdown (common to both views).
-        Positioned absolutely. For mobile, it's aligned to the right edge.
-      */}
+      {/* Only render the filter dropdown when the showFilters flag is true */}
       {showFilters && (
         <FilterDropdown
           sortOrder={sortOrder}

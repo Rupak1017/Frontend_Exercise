@@ -48,7 +48,7 @@ const DogSearchPage: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Load persisted favorites on mount.
+  // Load persisted favorites from local storage on component mount
   useEffect(() => {
     const storedFavorites = localStorage.getItem("favorites");
     if (storedFavorites) {
@@ -56,10 +56,12 @@ const DogSearchPage: React.FC = () => {
     }
   }, []);
 
+  // Helper to update favorites in local storage
   const updateFavoritesStorage = (newFavorites: Dog[]) => {
     localStorage.setItem("favorites", JSON.stringify(newFavorites));
   };
 
+  // Toggle a dog's favorite status
   const toggleFavorite = (dog: Dog) => {
     setFavorites(prev => {
       let newFavorites;
@@ -74,6 +76,7 @@ const DogSearchPage: React.FC = () => {
     });
   };
 
+  // Generate pagination numbers, inserting ellipses when necessary
   const getPaginationNumbers = (currentPage: number, totalPages: number): (number | string)[] => {
     const pages: (number | string)[] = [];
     if (totalPages <= 7) {
@@ -92,6 +95,7 @@ const DogSearchPage: React.FC = () => {
     return pages;
   };
 
+  // Load dogs from search API based on filters and pagination
   const loadDogs = async (page: number = 1) => {
     setLoading(true);
     try {
@@ -117,6 +121,7 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  // Load breed names from the API
   const loadBreedNames = async () => {
     try {
       const response = await axios.get(`${API_BASE_URL}/dogs/breeds`, { withCredentials: true });
@@ -126,6 +131,7 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  // Update the location filter by fetching matching ZIP codes for the given city
   const applyLocationFilter = async () => {
     try {
       const filters = { city: locationCity, size: 100, from: 0 };
@@ -141,16 +147,19 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
+  // Clear the location filter settings
   const clearLocationFilter = () => {
     setLocationCity('');
     setLocationZipCodes(null);
   };
 
+  // Initial data load
   useEffect(() => {
     loadDogs();
     loadBreedNames();
   }, []);
 
+  // Reload dogs when any of the filter/sort settings change
   useEffect(() => {
     loadDogs(1);
   }, [selectedBreed, ageMin, ageMax, locationZipCodes, sortOrder, userHasToggledSort]);
@@ -158,6 +167,7 @@ const DogSearchPage: React.FC = () => {
   const totalPages = pagination ? Math.ceil(pagination.total / PAGE_SIZE) : 0;
   const paginationNumbers = totalPages ? getPaginationNumbers(currentPage, totalPages) : [];
 
+  // Log out the user and navigate to the homepage
   const handleLogout = async () => {
     try {
       await logoutUser();
@@ -171,11 +181,12 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  // Inject the Chatbase embed script into the container on mount.
+  // Inject the Chatbase chat widget script after page load
   useEffect(() => {
     const container = document.getElementById("chat-widget-container");
     if (container && !document.getElementById("33AC8VBme6-RVatOGz0kz")) {
       const script = document.createElement("script");
+      // This code snippet loads the Chatbase widget script into the container
       script.innerHTML = `(function(){
   if(!window.chatbase || window.chatbase("getState") !== "initialized"){
     window.chatbase = (...arguments) => {
@@ -247,7 +258,7 @@ const DogSearchPage: React.FC = () => {
         loading={loading}
       />
 
-      {/* Chatbot container fixed at bottom right; always rendered so Chatbase's own toggle/close works */}
+      {/* Chatbot container fixed at bottom right; it allows Chatbase's own toggle/close functionality */}
       <div
         id="chat-widget-container"
         className="fixed bottom-4 right-4 z-50 w-80 h-96 md:w-64 md:h-72"

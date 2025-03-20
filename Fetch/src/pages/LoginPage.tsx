@@ -4,15 +4,17 @@ import { useNavigate } from 'react-router-dom';
 import LoginForm from '../components/LoginForm';
 
 const LoginPage: React.FC = () => {
+  // Using useNavigate hook to switch between pages easily
   const navigate = useNavigate();
 
+  // Handle a successful login by navigating the user to the search page
   const handleLoginSuccess = () => {
     navigate('/search');
   };
 
   return (
     <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      {/* Video Background */}
+      {/* Video Background: This video creates a more engaging and lively background for the login page */}
       <video
         autoPlay
         muted

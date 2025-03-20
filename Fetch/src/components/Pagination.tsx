@@ -1,4 +1,4 @@
-// src/components/Pagination.tsx
+// This component handles the pagination functionality for the list view. It renders navigation buttons for first, previous, numbered pages, next, and last page.
 import React from 'react';
 import Button from './Button';
 
@@ -17,6 +17,7 @@ const Pagination: React.FC<PaginationProps> = ({
 }) => {
   return (
     <div className="flex justify-center items-center space-x-2 mt-6">
+      {/* Button for going to the first page */}
       <Button 
         onClick={() => onPageChange(1)} 
         disabled={currentPage === 1} 
@@ -24,6 +25,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         {"<<"}
       </Button>
+      {/* Button for going to the previous page */}
       <Button 
         onClick={() => onPageChange(currentPage - 1)} 
         disabled={currentPage === 1} 
@@ -31,6 +33,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         {"<"}
       </Button>
+      {/* Map over paginationNumbers to render page number buttons or ellipses */}
       {paginationNumbers.map((page, index) =>
         typeof page === "number" ? (
           <Button
@@ -48,6 +51,7 @@ const Pagination: React.FC<PaginationProps> = ({
           </span>
         )
       )}
+      {/* Button for going to the next page */}
       <Button 
         onClick={() => onPageChange(currentPage + 1)} 
         disabled={currentPage === totalPages || totalPages === 0} 
@@ -55,6 +59,7 @@ const Pagination: React.FC<PaginationProps> = ({
       >
         {">"}
       </Button>
+      {/* Button for going to the last page */}
       <Button 
         onClick={() => onPageChange(totalPages)} 
         disabled={currentPage === totalPages || totalPages === 0} 
