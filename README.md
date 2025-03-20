@@ -6,7 +6,7 @@ Welcome to Fur Buddy—the perfect companion for pet lovers! Whether you're adop
 
 Browse lovable fur buddies looking for a home.
 
-Share your pet stories and connect with fellow animal enthusiasts.
+Match with the perfect pet based on your preferences.
 
 Interactive, responsive, and built with React + TypeScript!
 
