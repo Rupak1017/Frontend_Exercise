@@ -18,7 +18,7 @@ interface FilterDropdownProps {
 }
 
 const FilterDropdown: React.FC<FilterDropdownProps> = ({
-  sortOrder,
+  
   onSetSortOrder,
   ageMin,
   ageMax,

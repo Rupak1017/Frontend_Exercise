@@ -17,7 +17,7 @@ interface ButtonProps {
    * - "close": for the Close button in modals.
    * - "login": for the Login button.
    */
-  variant?: 'logout' | 'fav' | 'filter' | 'sortBreed' | 'sortLocation' | 'back' | 'match' | 'close' | 'login';
+  variant?: 'logout' | 'fav' | 'filter' | 'sortBreed' | 'sortLocation' | 'back' | 'match' | 'close' | 'login' | 'menu';
   className?: string;
   type?: "button" | "submit" | "reset";
 }

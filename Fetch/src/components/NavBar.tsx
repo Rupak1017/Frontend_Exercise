@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import BreedSearchBar from './BreedSearchBar';
 import Button from './Button';
 import FilterDropdown from './FilterDropdown';
-import { Dog } from '../types';
+
 
 interface NavBarProps {
   breedNames: string[];
