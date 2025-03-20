@@ -1,3 +1,4 @@
+// src/components/DogCard.tsx
 import React, { useState, useEffect } from 'react';
 import { Dog } from '../types';
 
@@ -31,20 +32,28 @@ const DogCard: React.FC<DogCardProps> = ({ dog, isFavorite, onToggleFavorite }) 
         <h2 className="font-bold text-lg">Name: {dog.name}</h2>
         <h2 className="font-bold text-lg">Age: {dog.age}</h2>
       </div>
-      {/* Bottom row: Breed, Heart Icon, and ZIP */}
+      {/* Bottom row: Breed, Bone Icon, and ZIP */}
       <div className='flex flex-row justify-between'>
-      <div className="mt-4 flex justify-between flex-col ">
-        <p className="font-semibold text-sm">Breed: {dog.breed}</p>
-                <p className="font-semibold text-sm">ZIP: {dog.zip_code}</p>
-      </div>
-      <button 
+        <div className="mt-4 flex justify-between flex-col">
+          <p className="font-semibold text-sm">Breed: {dog.breed}</p>
+          <p className="font-semibold text-sm">ZIP: {dog.zip_code}</p>
+        </div>
+        <button 
           onClick={handleToggle} 
           className="transition transform duration-300 hover:scale-110 mx-2"
         >
           {favorite ? (
-            <i className="ri-heart-fill text-red-500 text-2xl"></i>
+            <img 
+              src="/images/bone_solid.png" 
+              alt="Favorite Bone" 
+              className="w-6 h-6"
+            />
           ) : (
-            <i className="ri-heart-line text-gray-500 text-2xl"></i>
+            <img 
+              src="/images/bone_line.png" 
+              alt="Unfavorited Bone" 
+              className="w-6 h-6"
+            />
           )}
         </button>
       </div>

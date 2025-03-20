@@ -3,3 +3,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+.custom-icon {
+  font-size: 0.75rem !important;
+  transform: scale(0.75) !important;
+  line-height: 1 !important;
+}

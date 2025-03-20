@@ -34,31 +34,31 @@ const Button: React.FC<ButtonProps> = ({
 
   switch (variant) {
     case 'logout':
-      baseClasses += "bg-red-500 text-white hover:bg-red-600 px-4 py-2";
+      baseClasses += "bg-red-500 text-white hover:bg-red-600 px-2 py-1";
       break;
     case 'fav':
-      baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-4 py-2";
+      baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-2";
       break;
     case 'filter':
       baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-2 flex items-center gap-1";
       break;
     case 'sortBreed':
-      baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-2 py-1 text-xs";
+      baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-1 text-xs";
       break;
     case 'sortLocation':
-      baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-2 py-1 text-xs";
+      baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-1 text-xs";
       break;
     case 'back':
       baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2";
       break;
     case 'match':
-      baseClasses += "bg-green-500 text-white hover:bg-green-600 px-4 py-2";
+      baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-4 py-2";
       break;
     case 'close':
-      baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-4 py-2";
+      baseClasses += "bg-red-500 text-white hover:bg-red-600 px-4 py-2";
       break;
     case 'login':
-      baseClasses += "bg-indigo-500 text-white hover:bg-indigo-600 px-4 py-2";
+      baseClasses += "bg-yellow-500 text-white hover:bg-yellow-600 px-4 py-2";
       break;
     default:
       baseClasses += "bg-blue-500 text-white hover:bg-blue-600 px-4 py-2";
