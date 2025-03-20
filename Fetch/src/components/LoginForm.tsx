@@ -25,22 +25,24 @@ const LoginForm: React.FC<LoginFormProps> = ({ onLoginSuccess }) => {
   return (
     <form onSubmit={handleSubmit} className="max-w-md mx-auto  p-6">
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2 text-white">Name:</label>
+        <label className="block text-sm font-bold mb-2 text-white">Hooman's Name:</label>
         <input 
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          placeholder="xyz"
           className="w-full p-2 border rounded focus:outline-none focus:ring transition duration-300"
         />
       </div>
       <div className="mb-4">
-        <label className="block text-sm font-bold mb-2 text-white">Email:</label>
+        <label className="block text-sm font-bold mb-2 text-white">Hooman's Email:</label>
         <input 
           type="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          placeholder="xyz@gmail.com"
           className="w-full p-2 border rounded focus:outline-none focus:ring transition duration-300"
         />
       </div>

@@ -97,7 +97,7 @@ const NavBar: React.FC<NavBarProps> = ({
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold flex items-center gap-2">
             Fur <span className="text-yellow-400">Buddy</span>
-            <img src="/images/bone_solid.png" alt="Bone Icon" className="h-5 w-5" />
+            <img src="/images/dog.png" alt="Bone Icon" className="h-7 w-7" />
           </h1>
           {/* Wrap hamburger in a relative container */}
           <div className="relative">

@@ -1,3 +1,4 @@
+// src/pages/DogSearchPage.tsx
 import React, { useEffect, useState } from 'react';
 import { fetchDogsDetails } from '../api/dogs';
 import { searchLocations } from '../api/locations';
@@ -170,9 +171,43 @@ const DogSearchPage: React.FC = () => {
     }
   };
 
-  return (
-<div className="min-h-screen bg-white text-black w-[85%] mx-auto px-4 p-6">
+  // Inject the Chatbase embed script into the container on mount.
+  useEffect(() => {
+    const container = document.getElementById("chat-widget-container");
+    if (container && !document.getElementById("33AC8VBme6-RVatOGz0kz")) {
+      const script = document.createElement("script");
+      script.innerHTML = `(function(){
+  if(!window.chatbase || window.chatbase("getState") !== "initialized"){
+    window.chatbase = (...arguments) => {
+      if(!window.chatbase.q){ window.chatbase.q = []; }
+      window.chatbase.q.push(arguments);
+    };
+    window.chatbase = new Proxy(window.chatbase, {
+      get(target, prop){
+        if(prop==="q"){ return target.q; }
+        return (...args) => target(prop, ...args);
+      }
+    });
+  }
+  const onLoad = function(){
+    const s = document.createElement("script");
+    s.src = "https://www.chatbase.co/embed.min.js";
+    s.id = "33AC8VBme6-RVatOGz0kz";
+    s.domain = "www.chatbase.co";
+    document.getElementById("chat-widget-container").appendChild(s);
+  };
+  if(document.readyState === "complete"){
+    onLoad();
+  } else {
+    window.addEventListener("load", onLoad);
+  }
+})();`;
+      container.appendChild(script);
+    }
+  }, []);
 
+  return (
+    <div className="min-h-screen bg-white text-black w-[85%] mx-auto px-4 p-6">
       <NavBar
         breedNames={breedNames}
         onBreedSelect={setSelectedBreed}
@@ -211,6 +246,12 @@ const DogSearchPage: React.FC = () => {
         onPageChange={(page: number) => loadDogs(page)}
         loading={loading}
       />
+
+      {/* Chatbot container fixed at bottom right; always rendered so Chatbase's own toggle/close works */}
+      <div
+        id="chat-widget-container"
+        className="fixed bottom-4 right-4 z-50 w-80 h-96 md:w-64 md:h-72"
+      ></div>
     </div>
   );
 };

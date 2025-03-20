@@ -30,7 +30,7 @@ const FavoritesPage: React.FC = () => {
       {/* Content Container with consistent width */}
       <div className="w-[85%] mx-auto">
         {/* Custom Header in a single line for all screen sizes */}
-        <div className="flex justify-between items-center mb-5 pb-5 mt-5 border-b border-black  gap-2">
+        <div className="flex justify-between items-center mb-5 pb-5 mt-5 border-b border-black gap-2">
           <Button 
             onClick={() => navigate(-1)} 
             variant="back" 
@@ -72,17 +72,20 @@ const FavoritesPage: React.FC = () => {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm">
           <div className="bg-white p-4 sm:p-6 rounded shadow-lg text-center w-[90%] max-w-md">
             <h2 className="text-xl sm:text-2xl font-bold mb-4">It's a Match!</h2>
-            <DogCard 
-              dog={matchDog} 
-              isFavorite={true} 
-              onToggleFavorite={() => {}} 
-            />
+            <div className="flex justify-center">
+              <DogCard 
+                dog={matchDog} 
+                isFavorite={true} 
+                onToggleFavorite={() => {}} 
+              />
+            </div>
             <Button onClick={closeMatch} variant="close" className="mt-4">
               Close
             </Button>
           </div>
         </div>
       )}
+      
     </div>
   );
 };

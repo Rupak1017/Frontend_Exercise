@@ -40,7 +40,7 @@ const Button: React.FC<ButtonProps> = ({
       baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-2";
       break;
     case 'filter':
-      baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-3 py-2 flex items-center gap-1";
+      baseClasses += "bg-white border-[1px] border-black text-gray-700 hover:bg-gray-300 px-3 py-2 flex items-center gap-1";
       break;
     case 'sortBreed':
       baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-1 text-xs";
@@ -49,7 +49,7 @@ const Button: React.FC<ButtonProps> = ({
       baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-2 py-1 text-xs";
       break;
     case 'back':
-      baseClasses += "bg-gray-200 text-gray-700 hover:bg-gray-300 px-4 py-2";
+      baseClasses += "bg-white border-[1px] border-black text-gray-700 hover:bg-gray-300 px-3 py-2 flex items-center gap-1";
       break;
     case 'match':
       baseClasses += "bg-yellow-400 text-black hover:bg-yellow-500 px-4 py-2";
